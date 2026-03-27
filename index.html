@@ -155,15 +155,15 @@ tbody tr:last-child td{border-bottom:none;}
 .submit-final-btn:disabled{background:#94A3B8;cursor:not-allowed;color:#fff;}
 
 /* GOOGLE SHEET SETUP */
-.setup-step{background:#fff;border-radius:10px;border:1px solid var(--border);padding:16px;margin-bottom:12px;}
+
 .setup-step .step-num{background:var(--teal);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;margin-right:10px;flex-shrink:0;}
-.setup-step-hdr{display:flex;align-items:center;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+
 code{background:#F1F5F9;color:var(--navy);padding:2px 6px;border-radius:4px;font-size:12.5px;font-family:monospace;}
 pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12px;overflow-x:auto;line-height:1.6;margin:10px 0;}
-.url-input-grp{display:flex;gap:8px;margin-top:12px;}
-.url-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;}
+
+
 .url-input:focus{outline:none;border-color:var(--teal);}
-.save-url-btn{background:var(--navy);color:#fff;border:none;padding:9px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;}
+
 .status-msg{font-size:13px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none;}
 .status-msg.ok{background:#D1FAE5;color:#065F46;display:block;}
 .status-msg.err{background:#FEE2E2;color:#991B1B;display:block;}
@@ -551,12 +551,7 @@ pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12
 <!-- ══ SEC 5: CASES 1–5 ══ -->
 <div class="sec" id="sec-5">
   <div class="sec-tag">Assessment — Cases 1–5</div>
-  <div class="sec-hdr"><h2>Clinical Cases 1–5</h2><p>Each case is worth <strong>1 mark</strong>. One attempt only. No feedback shown until after submission.</p></div>
-  <div id="exam-timer-bar" style="background:var(--navy);color:#fff;border-radius:10px;padding:12px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;">
-  <span style="font-size:13px;font-weight:600;">⏱ Exam Timer</span>
-  <span id="timer-display" style="font-size:22px;font-weight:800;font-family:monospace;color:var(--amber);">15:00</span>
-  <span style="font-size:12px;opacity:.75;">15 minutes · 1 attempt per question</span>
-</div>
+  <div class="sec-hdr"><h2>Clinical Cases 1–5</h2><p>Each case is worth <strong>1 mark</strong>. Each case is worth <strong>1 mark</strong>. Select your answer and click <em>Submit Answer</em> to receive immediate feedback.</p></div>
 
   <div class="q-tracker" id="tracker-a">
     <div class="q-dot current" id="dot-1" onclick="scrollToQ('q1')">1</div>
@@ -670,12 +665,7 @@ pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12
 <!-- ══ SEC 6: CASES 6–10 ══ -->
 <div class="sec" id="sec-6">
   <div class="sec-tag">Assessment — Cases 6–10</div>
-  <div class="sec-hdr"><h2>Clinical Cases 6–10</h2><p>Final 5 cases. After completing all 10 cases proceed to <strong>Submit &amp; Results</strong>.</p></div>
-  <div style="background:var(--navy);color:#fff;border-radius:10px;padding:12px 20px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;">
-  <span style="font-size:13px;font-weight:600;">⏱ Exam Timer</span>
-  <span id="timer-display-2" style="font-size:22px;font-weight:800;font-family:monospace;color:var(--amber);">15:00</span>
-  <span style="font-size:12px;opacity:.75;">15 minutes · 1 attempt per question</span>
-</div>
+  <div class="sec-hdr"><h2>Clinical Cases 6–10</h2><p>Final 5 cases. After completing all 10 cases, proceed to <strong>Submit &amp; Results</strong>.</p></div>
 
   <div class="q-tracker" id="tracker-b">
     <div class="q-dot" id="dot-6" onclick="scrollToQ('q6')">6</div>
@@ -861,78 +851,7 @@ const EXPLANATIONS = {
 };
 
 // ── NAVIGATION ──
-// ── EXAM TIMER ──
-let timerInterval = null;
-let timerSeconds = 15 * 60; // 15 minutes
-let examStarted = false;
-let examLocked = false;
-
-function startExamTimer() {
-  if(examStarted) return;
-  examStarted = true;
-  timerSeconds = 15 * 60;
-  updateTimerDisplay();
-  timerInterval = setInterval(() => {
-    timerSeconds--;
-    updateTimerDisplay();
-    if(timerSeconds <= 0) {
-      clearInterval(timerInterval);
-      lockExam();
-    }
-    if(timerSeconds === 300) { // 5 min warning
-      const td = document.getElementById('timer-display');
-      if(td) td.style.color = '#F59E0B';
-    }
-    if(timerSeconds === 60) { // 1 min warning
-      const td = document.getElementById('timer-display');
-      if(td) td.style.color = '#DC2626';
-    }
-  }, 1000);
-}
-
-function updateTimerDisplay() {
-  const m = Math.floor(timerSeconds/60).toString().padStart(2,'0');
-  const s = (timerSeconds%60).toString().padStart(2,'0');
-  const txt = m + ':' + s;
-  ['timer-display','timer-display-2'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.textContent = txt;
-  });
-}
-
-function lockExam() {
-  examLocked = true;
-  // Disable all unanswered submit buttons
-  for(let q=1;q<=10;q++) {
-    if(!answers['Q'+q]) {
-      const btn = document.getElementById('btn-'+q);
-      if(btn) { btn.disabled=true; btn.textContent='Time Expired'; btn.style.background='#DC2626'; }
-    }
-  }
-  alert('⏰ Time is up! Your exam has been automatically submitted. Please click Submit & View Results.');
-  goTo(7);
-}
-
 function goTo(idx) {
-  // Intercept navigation to exam sections — show ready alert
-  if((idx === 5) && !examStarted) {
-    const ready = confirm(
-      '📋 EXAM INSTRUCTIONS\n\n' +
-      '• 10 clinical case questions\n' +
-      '• 1 mark per question (10 marks total)\n' +
-      '• You have 15 minutes\n' +
-      '• ONE attempt per question — no going back\n' +
-      '• No feedback shown until after submission\n' +
-      '• Timer starts immediately\n\n' +
-      'Are you ready to begin the exam?'
-    );
-    if(!ready) return;
-    startExamTimer();
-  }
-  if(idx === 6 && !examStarted) {
-    startExamTimer(); // fallback if they navigate directly
-  }
-
   document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
   document.getElementById('sec-' + idx).classList.add('active');
@@ -940,7 +859,7 @@ function goTo(idx) {
   for(let i=0;i<idx;i++) document.getElementById('nav-'+i).classList.add('done');
   updateProgress(idx);
   window.scrollTo({top:0,behavior:'smooth'});
-  if(idx === 7) { if(timerInterval) clearInterval(timerInterval); buildResults(); }
+  if(idx === 7) buildResults();
 }
 
 function updateProgress(idx) {
@@ -978,11 +897,21 @@ function submitQ(qNum, correctAns) {
     else if(o.value === val && !isRight) optDiv.classList.add('wrong');
   });
 
-  // No feedback shown during exam — answers recorded silently
+  // Show feedback immediately
+  const fb = document.getElementById('fb-'+qNum);
+  fb.className = 'fb show ' + (isRight ? 'ok' : 'nope');
+  fb.innerHTML = isRight
+    ? '<strong>✅ Correct!</strong> Well done — this is a challenging case requiring synthesis of multiple pharmacological concepts.'
+    : '<strong>❌ Incorrect.</strong> The correct answer is <strong>' + correctAns + '</strong>. ' + EXPLANATIONS[qNum];
+
+  // Reveal key point
+  const kp = document.getElementById('kp-'+qNum);
+  if(kp) kp.classList.add('show');
+
+  // Marks badge
   const mark = document.getElementById('mark-'+qNum);
-  mark.textContent = isRight ? '✓ Recorded' : '✗ Recorded';
-  mark.className = 'marks-badge show';
-  mark.style.background = 'var(--teal)';
+  mark.textContent = isRight ? '+1 mark ✓' : '0 marks ✗';
+  mark.className = 'marks-badge show ' + (isRight ? 'correct-mark' : 'wrong-mark');
 
   // Disable submit button
   document.getElementById('btn-'+qNum).disabled = true;
@@ -1094,17 +1023,6 @@ async function submitToGoogleSheets() {
   }
 }
 
-// ── SETUP GUIDE ──
-function saveScriptUrl() {
-  const url = document.getElementById('apps-script-url').value.trim();
-  const st = document.getElementById('url-save-status');
-  if(!url || !url.includes('script.google.com')) {
-    st.className = 'status-msg err'; st.textContent = '❌ Please enter a valid Google Apps Script URL.'; st.style.display='block'; return;
-  }
-  scriptUrl = url;
-  localStorage.setItem('nhsScriptUrl', url);
-  st.className = 'status-msg ok'; st.textContent = '✅ URL saved! Students can now submit their responses.'; st.style.display='block';
-}
 
 // ── DOCX DOWNLOAD ──
 function downloadDocx() {
