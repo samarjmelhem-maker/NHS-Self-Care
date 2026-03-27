@@ -1,0 +1,1201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NHS Self-Care: Interactive Learning & Assessment Module</title>
+<style>
+:root {
+  --navy:#0D2D6B; --teal:#0A7E8C; --teal-l:#14B8A6;
+  --amber:#F59E0B; --red:#DC2626; --green:#16A34A;
+  --purple:#7C3AED; --bg:#F0F4FA; --card:#fff;
+  --border:#DDE3EE; --text:#1E293B; --muted:#64748B;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Calibri,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* TOP BAR */
+.topbar{background:var(--navy);color:#fff;padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.25);}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.tb-badge{background:var(--amber);color:var(--navy);font-weight:700;font-size:12px;padding:3px 10px;border-radius:20px;}
+.topbar h1{font-size:15px;font-weight:700;}
+.tb-right{display:flex;align-items:center;gap:10px;}
+.dl-btn{background:var(--teal-l);color:#fff;border:none;padding:7px 16px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;}
+.dl-btn:hover{background:var(--teal);}
+.progress-wrap{background:#1a3f7a;height:4px;}
+.progress-bar{height:100%;background:var(--amber);transition:width .4s;}
+
+/* LAYOUT */
+.layout{display:flex;min-height:calc(100vh - 62px);}
+.sidebar{width:230px;background:#fff;border-right:1px solid var(--border);position:sticky;top:62px;height:calc(100vh - 62px);overflow-y:auto;padding:12px 0;flex-shrink:0;}
+.sid-title{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:0 14px 8px;}
+.nav-i{display:flex;align-items:center;gap:8px;padding:8px 14px;cursor:pointer;font-size:13px;border-left:3px solid transparent;transition:all .15s;line-height:1.3;}
+.nav-i:hover{background:#f0f4fa;color:var(--navy);}
+.nav-i.active{background:#eef3ff;color:var(--navy);border-left-color:var(--teal);font-weight:600;}
+.nav-i.done{color:var(--green);}
+.nav-dot{width:22px;height:22px;border-radius:50%;background:var(--bg);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:var(--muted);}
+.nav-i.active .nav-dot{background:var(--teal);border-color:var(--teal);color:#fff;}
+.nav-i.done .nav-dot{background:var(--green);border-color:var(--green);color:#fff;}
+.nav-sep{height:1px;background:var(--border);margin:6px 14px;}
+
+main{flex:1;padding:24px 32px;max-width:920px;}
+.sec{display:none;animation:fi .3s ease;}
+.sec.active{display:block;}
+@keyframes fi{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* CARDS */
+.card{background:var(--card);border-radius:11px;padding:20px;margin-bottom:16px;border:1px solid var(--border);box-shadow:0 1px 3px rgba(0,0,0,.04);}
+.card h3{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--teal-l);}
+.card p{font-size:14px;line-height:1.7;margin-bottom:8px;}
+.sec-tag{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.sec-hdr h2{font-size:24px;font-weight:800;color:var(--navy);margin-bottom:6px;}
+.sec-hdr p{color:var(--muted);font-size:14px;line-height:1.6;margin-bottom:20px;}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,#0A5E74 100%);color:#fff;border-radius:14px;padding:32px 36px;margin-bottom:20px;position:relative;overflow:hidden;}
+.hero::before{content:"🏥";position:absolute;right:24px;top:16px;font-size:72px;opacity:.1;}
+.hero .badge{background:var(--amber);color:var(--navy);padding:3px 12px;border-radius:20px;font-size:11px;font-weight:700;display:inline-block;margin-bottom:12px;}
+.hero h2{font-size:24px;font-weight:800;margin-bottom:6px;}
+.hero p{opacity:.85;font-size:14px;line-height:1.6;margin-bottom:12px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:14px;}
+.hero-meta span{font-size:12px;opacity:.8;display:flex;align-items:center;gap:5px;}
+
+/* REGISTRATION */
+.reg-form{background:var(--card);border-radius:14px;padding:30px;border:1px solid var(--border);max-width:540px;margin:0 auto;}
+.reg-form h3{font-size:20px;font-weight:700;color:var(--navy);margin-bottom:18px;text-align:center;}
+.form-g{margin-bottom:16px;}
+.form-g label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+.form-g input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;transition:border-color .2s;}
+.form-g input:focus{outline:none;border-color:var(--teal);}
+.start-btn{width:100%;background:var(--navy);color:#fff;border:none;padding:13px;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:background .2s;}
+.start-btn:hover{background:var(--teal);}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto;margin:12px 0;border-radius:9px;border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{background:var(--navy);color:#fff;padding:9px 12px;text-align:left;font-size:12px;}
+tbody tr:nth-child(even){background:#f8faff;}
+tbody td{padding:8px 12px;border-bottom:1px solid #eef1f8;vertical-align:top;line-height:1.5;}
+tbody tr:last-child td{border-bottom:none;}
+
+/* PEARL */
+.pearl{background:linear-gradient(135deg,#eff6ff,#eef3ff);border-left:4px solid var(--navy);border-radius:0 9px 9px 0;padding:12px 16px;margin:12px 0;}
+.pearl p{font-size:13.5px;line-height:1.6;color:var(--navy);font-style:italic;}
+.p-lbl{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.warn{background:#FEF3C7;border-left:4px solid var(--amber);}
+.warn p{color:#92400E;font-style:normal;}
+.danger{background:#FEF2F2;border-left:4px solid var(--red);}
+.danger p{color:#7F1D1D;font-style:normal;}
+
+/* PILL BADGES */
+.pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;margin:3px 2px;}
+.pill-green{background:#D1FAE5;color:#065F46;}
+.pill-red{background:#FEE2E2;color:#991B1B;}
+.pill-blue{background:#DBEAFE;color:#1E40AF;}
+.pill-amber{background:#FEF3C7;color:#92400E;}
+.pill-purple{background:#EDE9FE;color:#5B21B6;}
+
+/* LEARNING CONCEPTS */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:14px 0;}
+.concept-card{background:linear-gradient(135deg,var(--navy),#1a4a8a);color:#fff;border-radius:10px;padding:16px;}
+.concept-card h4{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--amber);}
+.concept-card p{font-size:12.5px;line-height:1.6;opacity:.9;}
+.concept-card ul{padding-left:16px;}
+.concept-card li{font-size:12.5px;line-height:1.7;opacity:.9;}
+.cond-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:12px 0;}
+.cond-item{background:#EEF3FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:12.5px;color:var(--navy);}
+.cond-cat{font-size:10px;font-weight:700;color:var(--teal);text-transform:uppercase;display:block;margin-bottom:2px;}
+
+/* MCQ ENGINE */
+.case-box{background:linear-gradient(135deg,#F0FDF4,#ECFEFF);border:1px solid #A7F3D0;border-radius:10px;padding:16px;margin-bottom:14px;}
+.case-box .q-num{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;margin-bottom:4px;}
+.case-box .difficulty{float:right;font-size:11px;color:var(--amber);}
+.vignette{background:rgba(255,255,255,.75);border-radius:8px;padding:14px;font-size:13.5px;line-height:1.7;color:#134E4A;margin-bottom:14px;border-left:3px solid var(--teal);}
+.q-stem{font-size:14.5px;font-weight:700;color:var(--navy);margin-bottom:14px;line-height:1.5;}
+.opts{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.opt{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;transition:all .15s;font-size:14px;line-height:1.5;background:#fff;}
+.opt:hover{border-color:var(--teal);background:#F0FDFA;}
+.opt input{margin-top:2px;flex-shrink:0;accent-color:var(--teal);}
+.opt.correct{border-color:var(--green);background:#F0FDF4;}
+.opt.wrong{border-color:var(--red);background:#FEF2F2;}
+.opt.reveal-correct{border-color:var(--green);background:#F0FDF4;}
+.fb{margin-top:12px;padding:14px;border-radius:9px;display:none;font-size:13.5px;line-height:1.6;}
+.fb.show{display:block;}
+.fb.ok{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0;}
+.fb.nope{background:#FEF2F2;color:#991B1B;border:1px solid #FECACA;}
+.keypoint{background:linear-gradient(135deg,var(--navy),#1a4a8a);color:#fff;border-radius:8px;padding:12px 16px;margin-top:10px;font-size:13px;line-height:1.6;display:none;}
+.keypoint.show{display:block;}
+.keypoint strong{color:var(--amber);}
+.submit-q-btn{background:var(--teal);color:#fff;border:none;padding:9px 22px;border-radius:7px;font-size:13.5px;font-weight:600;cursor:pointer;transition:background .2s;}
+.submit-q-btn:hover{background:var(--navy);}
+.marks-badge{display:inline-flex;align-items:center;gap:5px;background:var(--navy);color:#fff;padding:5px 12px;border-radius:18px;font-size:12px;font-weight:600;margin-left:10px;opacity:0;transition:opacity .3s;}
+.marks-badge.show{opacity:1;}
+.marks-badge.correct-mark{background:var(--green);}
+.marks-badge.wrong-mark{background:var(--red);}
+
+/* PROGRESS TRACKER */
+.q-tracker{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.q-dot{width:34px;height:34px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--muted);transition:all .2s;}
+.q-dot.current{border-color:var(--teal);background:var(--teal);color:#fff;}
+.q-dot.answered-correct{border-color:var(--green);background:var(--green);color:#fff;}
+.q-dot.answered-wrong{border-color:var(--red);background:var(--red);color:#fff;}
+
+/* SUBMISSION */
+.submit-panel{background:linear-gradient(135deg,var(--navy),#0A5E74);color:#fff;border-radius:14px;padding:28px;margin-bottom:20px;text-align:center;}
+.submit-panel h2{font-size:22px;font-weight:800;margin-bottom:6px;}
+.submit-panel p{opacity:.85;font-size:14px;margin-bottom:16px;}
+.score-big{font-size:56px;font-weight:900;color:var(--amber);line-height:1;}
+.score-sub{font-size:15px;opacity:.8;margin:6px 0 20px;}
+.score-detail{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.score-item{background:rgba(255,255,255,.12);border-radius:10px;padding:12px;text-align:center;}
+.score-item .val{font-size:22px;font-weight:700;color:var(--amber);}
+.score-item .lbl{font-size:11px;opacity:.75;margin-top:2px;}
+.submit-final-btn{background:var(--amber);color:var(--navy);border:none;padding:13px 32px;border-radius:9px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.submit-final-btn:hover{background:#D97706;color:#fff;}
+.submit-final-btn:disabled{background:#94A3B8;cursor:not-allowed;color:#fff;}
+
+/* GOOGLE SHEET SETUP */
+.setup-step{background:#fff;border-radius:10px;border:1px solid var(--border);padding:16px;margin-bottom:12px;}
+.setup-step .step-num{background:var(--teal);color:#fff;width:28px;height:28px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;margin-right:10px;flex-shrink:0;}
+.setup-step-hdr{display:flex;align-items:center;font-size:15px;font-weight:700;color:var(--navy);margin-bottom:10px;}
+code{background:#F1F5F9;color:var(--navy);padding:2px 6px;border-radius:4px;font-size:12.5px;font-family:monospace;}
+pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12px;overflow-x:auto;line-height:1.6;margin:10px 0;}
+.url-input-grp{display:flex;gap:8px;margin-top:12px;}
+.url-input{flex:1;padding:9px 12px;border:1.5px solid var(--border);border-radius:7px;font-size:13px;font-family:inherit;}
+.url-input:focus{outline:none;border-color:var(--teal);}
+.save-url-btn{background:var(--navy);color:#fff;border:none;padding:9px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;}
+.status-msg{font-size:13px;margin-top:8px;padding:8px 12px;border-radius:7px;display:none;}
+.status-msg.ok{background:#D1FAE5;color:#065F46;display:block;}
+.status-msg.err{background:#FEE2E2;color:#991B1B;display:block;}
+.status-msg.pending{background:#FEF3C7;color:#92400E;display:block;}
+
+/* NAV BUTTONS */
+.nav-btns{display:flex;justify-content:space-between;margin-top:24px;padding-top:18px;border-top:1px solid var(--border);}
+.nav-btn{background:var(--navy);color:#fff;border:none;padding:10px 22px;border-radius:7px;font-size:13.5px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .2s;}
+.nav-btn:hover{background:var(--teal);}
+.nav-btn:disabled{background:#CBD5E1;cursor:not-allowed;}
+.tip-box{background:linear-gradient(135deg,#FFFBEB,#FEF9C3);border:1px solid #FDE68A;border-radius:9px;padding:14px;margin:12px 0;}
+.tip-box p{font-size:13.5px;line-height:1.65;color:#92400E;}
+.tip-box strong{color:#B45309;}
+@media(max-width:768px){.sidebar{display:none;}main{padding:16px;}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <span class="tb-badge">NHS SELF-CARE</span>
+    <h1>Interactive Learning & Assessment Module</h1>
+  </div>
+  <div class="tb-right">
+    <span id="student-name-display" style="font-size:13px;opacity:.8;"></span>
+    <button class="dl-btn" onclick="downloadDocx()">⬇ Download DOCX</button>
+  </div>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="pbar" style="width:0%"></div></div>
+
+<div class="layout">
+<aside class="sidebar">
+  <div class="sid-title">Module Navigation</div>
+  <div class="nav-i active" onclick="goTo(0)" id="nav-0"><div class="nav-dot">🏠</div><span>Registration</span></div>
+  <div class="nav-sep"></div>
+  <div class="sid-title">Learning Content</div>
+  <div class="nav-i" onclick="goTo(1)" id="nav-1"><div class="nav-dot">1</div><span>NHS Policy & 35 Conditions</span></div>
+  <div class="nav-i" onclick="goTo(2)" id="nav-2"><div class="nav-dot">2</div><span>Medicine Classification</span></div>
+  <div class="nav-i" onclick="goTo(3)" id="nav-3"><div class="nav-dot">3</div><span>Assessment Frameworks</span></div>
+  <div class="nav-i" onclick="goTo(4)" id="nav-4"><div class="nav-dot">4</div><span>Conditions Overview</span></div>
+  <div class="nav-sep"></div>
+  <div class="sid-title">Assessment (10 Cases)</div>
+  <div class="nav-i" onclick="goTo(5)" id="nav-5"><div class="nav-dot">📝</div><span>Cases 1–5</span></div>
+  <div class="nav-i" onclick="goTo(6)" id="nav-6"><div class="nav-dot">📝</div><span>Cases 6–10</span></div>
+  <div class="nav-sep"></div>
+  <div class="nav-i" onclick="goTo(7)" id="nav-7"><div class="nav-dot">📤</div><span>Submit & Results</span></div>
+  <div class="nav-i" onclick="goTo(8)" id="nav-8"><div class="nav-dot">⚙</div><span>Setup Guide</span></div>
+</aside>
+
+<main>
+
+<!-- ══ SEC 0: REGISTRATION ══ -->
+<div class="sec active" id="sec-0">
+  <div class="hero">
+    <div class="badge">5th Year B.Pharm · OTC</div>
+    <h2>NHS Self-Care: A Reference Guide</h2>
+    <p>Advanced Clinical Assessment Module · Dr. Samar J. Melhem | School of Pharmacy, University of Jordan</p>
+    <div class="hero-meta">
+      <span>📚 4 Learning Sections</span>
+      <span>📝 10 Clinical Cases</span>
+      <span>🏆 10 Marks Total (1 per case)</span>
+      <span>⏱ ~60 Minutes</span>
+    </div>
+  </div>
+
+  <div class="reg-form">
+    <h3>🎓 Student Registration</h3>
+    <div class="form-g">
+      <label>Full Name *</label>
+      <input type="text" id="stu-name" placeholder="e.g., Ahmad Al-Hassan" />
+    </div>
+    <div class="form-g">
+      <label>Student ID *</label>
+      <input type="text" id="stu-id" placeholder="e.g., 202212345" />
+    </div>
+    <div class="form-g">
+      <label>Section / Group</label>
+      <input type="text" id="stu-section" placeholder="e.g., Section A" />
+    </div>
+    <div class="form-g">
+      <label>Email (optional)</label>
+      <input type="email" id="stu-email" placeholder="student@ju.edu.jo" />
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.5;">⚠️ Complete the <strong>4 learning sections first</strong>, then attempt the 10 clinical cases. Your responses will be automatically submitted and marked.</p>
+    <button class="start-btn" onclick="startModule()">▶ Start Module</button>
+    <div id="reg-err" style="color:var(--red);font-size:13px;margin-top:8px;display:none;"></div>
+  </div>
+</div>
+
+<!-- ══ SEC 1: NHS POLICY & 35 CONDITIONS ══ -->
+<div class="sec" id="sec-1">
+  <div class="sec-tag">Learning Section 1</div>
+  <div class="sec-hdr"><h2>NHS Policy & The 35 Conditions</h2><p>Understanding the 2018 NHS England guidance and when prescribing exceptions apply.</p></div>
+
+  <div class="card">
+    <h3>🏛 NHS 2018 Guidance — Background</h3>
+    <div class="concept-grid">
+      <div class="concept-card"><h4>💷 Annual Savings</h4><p>Estimated <strong>£569 million/year</strong> from a "self-care first" approach. Reduces GP and pharmacy burden for self-limiting conditions.</p></div>
+      <div class="concept-card"><h4>⏱ Self-Limiting</h4><p>Most minor ailments resolve within <strong>7–14 days</strong> with appropriate self-care. NHS prescribing provides no clinical added value.</p></div>
+      <div class="concept-card"><h4>📋 The Guidance</h4><p>NHS England issued guidance (March 2018) listing <strong>35 conditions</strong> where OTC items should NOT routinely be prescribed.</p></div>
+      <div class="concept-card"><h4>⚠️ Not Absolute</h4><p>The guidance does <strong>NOT prevent</strong> prescribing — it requires clinical judgement and documented justification when exceptions apply.</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📋 The 35 Conditions — Full List</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin:12px 0;">
+      <div><div class="pill pill-blue">🩺 Skin & Hair</div>
+        <div class="cond-grid" style="margin-top:6px;">
+          <div class="cond-item"><span class="cond-cat">Skin</span>Mild acne</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Mild dry skin</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Sunburn</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Dandruff</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Cradle cap</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Nappy rash</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Head lice</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Ringworm / Athlete's foot</div>
+          <div class="cond-item"><span class="cond-cat">Skin</span>Warts & verrucae</div>
+        </div>
+      </div>
+      <div><div class="pill pill-green">🫃 GI Conditions</div>
+        <div class="cond-grid" style="margin-top:6px;">
+          <div class="cond-item"><span class="cond-cat">GI</span>Infrequent constipation</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Diarrhoea (adults)</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Haemorrhoids</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Indigestion / heartburn</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Infant colic</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Oral thrush</div>
+          <div class="cond-item"><span class="cond-cat">GI</span>Teething pain</div>
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px;margin-top:6px;">
+      <div><div class="pill pill-amber">🤧 Respiratory</div>
+        <div class="cond-grid" style="margin-top:6px;">
+          <div class="cond-item"><span class="cond-cat">Resp</span>Common cold</div>
+          <div class="cond-item"><span class="cond-cat">Resp</span>Cough (acute)</div>
+          <div class="cond-item"><span class="cond-cat">Resp</span>Nasal congestion</div>
+          <div class="cond-item"><span class="cond-cat">Resp</span>Sore throat (mild)</div>
+          <div class="cond-item"><span class="cond-cat">Resp</span>Ear pain (mild)</div>
+          <div class="cond-item"><span class="cond-cat">Resp</span>Hay fever (seasonal)</div>
+        </div>
+      </div>
+      <div><div class="pill pill-purple">💊 Other</div>
+        <div class="cond-grid" style="margin-top:6px;">
+          <div class="cond-item"><span class="cond-cat">MSK</span>Mild pain (headache, sprains)</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Mouth ulcers</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Dry eyes</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Cold sores</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Conjunctivitis (infective)</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Ingrowing toenail (mild)</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Insect bites (mild)</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Vaginal thrush</div>
+          <div class="cond-item"><span class="cond-cat">Other</span>Travel sickness</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>✅ When Prescribing IS Appropriate — Key Exceptions</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Exception Category</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1</strong></td><td><strong>Long-Term Condition</strong> — minor ailment is ongoing consequence of chronic disease or its treatment</td><td>Opioid-induced constipation in chronic pain patient</td></tr>
+          <tr><td><strong>2</strong></td><td><strong>Multiple Conditions</strong> — patient has multiple conditions and it would be inappropriate to treat in isolation</td><td>Skin dryness secondary to eczema already under care</td></tr>
+          <tr><td><strong>3</strong></td><td><strong>Exceptional Circumstances</strong> — e.g., financial hardship, inability to purchase OTC safely</td><td>Documented financial hardship preventing OTC purchase</td></tr>
+          <tr><td><strong>4</strong></td><td><strong>ACBS Approved</strong> — Advisory Committee on Borderline Substances items for specific medical conditions</td><td>Sunscreen for PLE, xeroderma pigmentosum</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pearl">
+      <div class="p-lbl">🔑 Exam Key Point</div>
+      <p>The <strong>long-term condition exception</strong> is the most commonly tested. When a minor ailment is a <em>direct, ongoing consequence</em> of a chronic disease or its treatment, NHS prescribing is justified — requires documented clinical reasoning.</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(0)">← Registration</button>
+    <button class="nav-btn" onclick="goTo(2)">Medicine Classification →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 2: MEDICINE CLASSIFICATION ══ -->
+<div class="sec" id="sec-2">
+  <div class="sec-tag">Learning Section 2</div>
+  <div class="sec-hdr"><h2>UK Medicine Classification — Three-Tier System</h2><p>GSL, P, and POM: what they mean clinically and why reclassification matters.</p></div>
+
+  <div class="card">
+    <h3>📦 The Three Classification Tiers</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Class</th><th>Full Name</th><th>Access</th><th>Pharmacist Required</th><th>Key Examples</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill pill-green">GSL</span></td><td>General Sales List</td><td>Any retail outlet</td><td>No</td><td>Paracetamol ×16, Ibuprofen ×16, Simple linctus</td></tr>
+          <tr><td><span class="pill pill-amber">P</span></td><td>Pharmacy Medicine</td><td>Pharmacy only, pharmacist present</td><td>Yes — must be available for consultation</td><td>Omeprazole 10mg, Cetirizine 10mg, BPO 5%/10%, Loperamide, Chloramphenicol eye drops</td></tr>
+          <tr><td><span class="pill pill-red">POM</span></td><td>Prescription-Only Medicine</td><td>Valid prescription required</td><td>Dispenses prescription</td><td>Omeprazole 20–40mg, Fluticasone nasal spray (now P), Antibiotics, Codeine (≥12.8mg)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔄 Reclassification (POM → P) — Regulatory Rationale</h3>
+    <div class="concept-grid">
+      <div class="concept-card"><h4>Minimum Effective Dose</h4><p>OTC reclassification uses the <strong>lowest effective dose</strong> for the <strong>narrowest self-care indication</strong>. Higher doses require diagnosis.</p></div>
+      <div class="concept-card"><h4>Duration Restriction</h4><p>OTC time limits (e.g., 2 weeks for PPIs) prevent masking serious pathology requiring clinical investigation.</p></div>
+      <div class="concept-card"><h4>MHRA Safety Design</h4><p>Dose and duration restrictions are <strong>regulatory safety design</strong> — not commercial or pharmacokinetic decisions.</p></div>
+      <div class="concept-card"><h4>Pack Size Limits</h4><p>GSL/P pack sizes are capped. Smaller packs reduce risk of unintentional overdose (e.g., paracetamol GSL max ×16 tablets).</p></div>
+    </div>
+    <div class="pearl">
+      <div class="p-lbl">🔬 Key Example — Omeprazole</div>
+      <p><strong>OTC:</strong> 10mg daily × max 2 weeks — for symptomatic short-term GERD relief only<br>
+      <strong>POM:</strong> 20–40mg — for erosive oesophagitis, H. pylori triple therapy, Barrett's oesophagus, Zollinger-Ellison syndrome (all require confirmed diagnosis + prescriber oversight)<br>
+      The restriction is a <strong>regulatory safety boundary</strong>, not a commercial differential.</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(1)">← NHS Policy</button>
+    <button class="nav-btn" onclick="goTo(3)">Assessment Frameworks →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 3: ASSESSMENT FRAMEWORKS ══ -->
+<div class="sec" id="sec-3">
+  <div class="sec-tag">Learning Section 3</div>
+  <div class="sec-hdr"><h2>Clinical Assessment Frameworks</h2><p>SOAP, SCHOLAR-MAC, and PQRST — how they integrate in OTC consultations.</p></div>
+
+  <div class="card">
+    <h3>🗂 SOAP — Universal Documentation Structure</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Letter</th><th>Component</th><th>What it Captures</th></tr></thead>
+        <tbody>
+          <tr><td><strong style="color:var(--navy);font-size:18px;">S</strong></td><td><strong>Subjective</strong></td><td>What the patient tells you — chief complaint, symptoms, history. Embed SCHOLAR-MAC here for OTC.</td></tr>
+          <tr><td><strong style="color:var(--navy);font-size:18px;">O</strong></td><td><strong>Objective</strong></td><td>Observable/measurable data — vital signs, physical examination, test results.</td></tr>
+          <tr><td><strong style="color:var(--navy);font-size:18px;">A</strong></td><td><strong>Assessment</strong></td><td>Clinical impression, working diagnosis, differential diagnoses.</td></tr>
+          <tr><td><strong style="color:var(--navy);font-size:18px;">P</strong></td><td><strong>Plan</strong></td><td>Treatment, referral, follow-up, patient education.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔍 SCHOLAR-MAC — OTC Triage Framework</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Letter</th><th>Element</th><th>Key Questions</th></tr></thead>
+        <tbody>
+          <tr><td><strong>S</strong></td><td>Symptoms</td><td>What is the main complaint?</td></tr>
+          <tr><td><strong>C</strong></td><td>Characteristics</td><td>Quality, severity — sharp, dull, burning; pattern over time</td></tr>
+          <tr><td><strong>H</strong></td><td>History</td><td>Past episodes, what has been tried; chronicity</td></tr>
+          <tr><td><strong>O</strong></td><td>Onset</td><td>When did it start? Sudden or gradual?</td></tr>
+          <tr><td><strong>L</strong></td><td>Location</td><td>Where? Does it radiate? — embed PQRST here for pain</td></tr>
+          <tr><td><strong>A</strong></td><td>Aggravating/Alleviating</td><td>What makes it worse or better?</td></tr>
+          <tr><td><strong>R</strong></td><td>Remission</td><td>Does it come and go? How long does it last?</td></tr>
+          <tr><td><strong>M</strong></td><td><strong>Medications</strong></td><td>⚠️ ALL current medications — NEVER conditional</td></tr>
+          <tr><td><strong>A</strong></td><td><strong>Allergies</strong></td><td>⚠️ Drug & food allergies — NEVER conditional</td></tr>
+          <tr><td><strong>C</strong></td><td><strong>Conditions</strong></td><td>⚠️ Medical history — NEVER conditional</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pearl danger">
+      <div class="p-lbl" style="color:var(--red);">⚠️ Critical Rule</div>
+      <p style="color:#7F1D1D;">The <strong>MAC component</strong> (Medications, Allergies, Conditions) is the mandatory safety screen — NEVER conditional on patient disclosure. Always ask, even if the patient appears to volunteer the information unprompted.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>🔬 PQRST — Pain Characterisation (embedded within SCHOLAR-MAC)</h3>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Letter</th><th>Element</th><th>Examples</th></tr></thead>
+        <tbody>
+          <tr><td><strong>P</strong></td><td>Provocation / Palliation</td><td>What brings it on? What makes it better/worse?</td></tr>
+          <tr><td><strong>Q</strong></td><td>Quality</td><td>Sharp, dull, burning, cramping, throbbing, pressure?</td></tr>
+          <tr><td><strong>R</strong></td><td>Radiation</td><td>Does it spread? Where? (jaw pain = cardiac; right shoulder = gallbladder)</td></tr>
+          <tr><td><strong>S</strong></td><td>Severity</td><td>0–10 pain scale; functional impairment</td></tr>
+          <tr><td><strong>T</strong></td><td>Timing</td><td>Constant vs intermittent; duration; pattern</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pearl">
+      <div class="p-lbl">🔑 Framework Integration — Exam Favourite</div>
+      <p><strong>Optimal sequence:</strong> SOAP (overarching structure) → SCHOLAR-MAC within Subjective (OTC triage) → PQRST within SCHOLAR-MAC Characteristics/Location for granular pain assessment. PQRST is NOT restricted to ward settings — it applies wherever a dominant symptom needs deep characterisation.</p>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(2)">← Medicine Classification</button>
+    <button class="nav-btn" onclick="goTo(4)">Conditions Overview →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 4: CONDITIONS OVERVIEW ══ -->
+<div class="sec" id="sec-4">
+  <div class="sec-tag">Learning Section 4</div>
+  <div class="sec-hdr"><h2>Key Conditions — High-Yield Clinical Points</h2><p>Evidence-based management of conditions most heavily tested in the examination.</p></div>
+
+  <div class="card">
+    <h3>☀️ Sunburn & Photodermatoses</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Topic</th><th>Key Guidance</th></tr></thead>
+      <tbody>
+        <tr><td>Analgesia</td><td>Paracetamol or ibuprofen for pain. In pregnancy → <strong>paracetamol only</strong> (NSAIDs CI from 2nd trimester — premature ductus arteriosus closure)</td></tr>
+        <tr><td>NHS ACBS Sunscreen</td><td>Prescribed for: PLE, xeroderma pigmentosum, porphyria. Spec: <strong>SPF 30+ broad-spectrum UVA+UVB. Year-round (not seasonal)</strong></td></tr>
+        <tr><td>Red Flags → Refer</td><td>Blistering >20% BSA; infection signs (pus, fever); systemic symptoms; sunburn in infants; burns to face/hands/genitalia</td></tr>
+      </tbody>
+    </table></div>
+    <div class="pearl warn"><div class="p-lbl" style="color:#B45309;">⚠️ Common Misconception</div><p>ACBS sunscreen prescribing for PLE is NOT seasonal. UV exposure occurs year-round (cloudy days, car windows). <strong>Year-round daily use is required.</strong></p></div>
+  </div>
+
+  <div class="card">
+    <h3>🫧 Mild Acne — Benzoyl Peroxide (BPO)</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Topic</th><th>Evidence-Based Guidance</th></tr></thead>
+      <tbody>
+        <tr><td>BPO Dosing Strategy</td><td>Start 2.5% once daily → escalate to 5% after 2–4 weeks if tolerated. <strong>2.5% = 10% antibacterially.</strong> Lower concentration = significantly less irritation</td></tr>
+        <tr><td>Mechanisms</td><td>Antibacterial (C. acnes), comedolytic (mild keratolytic), anti-inflammatory. Effective for BOTH comedonal AND inflammatory acne</td></tr>
+        <tr><td>Red Flags → Refer</td><td>Nodules/cysts/scarring; no response after 12 weeks OTC; psychological distress; sudden onset in adults (hormonal cause)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>💊 Laxatives — Pharmacological Mechanisms</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Class</th><th>Mechanism</th><th>Examples</th><th>Key Notes</th></tr></thead>
+      <tbody>
+        <tr><td>Bulk-forming</td><td>Increase stool bulk via water absorption</td><td>Ispaghula husk (Fybogel)</td><td>Requires adequate fluid & peristalsis. <strong>Avoid in opioid-induced constipation</strong></td></tr>
+        <tr><td>Osmotic</td><td>Draw water into bowel lumen</td><td>Lactulose, Macrogol (PEG)</td><td><strong>Macrogol</strong>: non-fermented (no gas), renally safe, superior in elderly/opioid-induced constipation</td></tr>
+        <tr><td>Stimulant</td><td>Stimulate enteric nerves → peristalsis</td><td>Bisacodyl, Senna</td><td><strong>Max ~1 week</strong> — long-term use risks colonic atony ("cathartic colon")</td></tr>
+        <tr><td>Stool softener</td><td>Reduces surface tension of stool</td><td>Docusate</td><td>Limited efficacy alone; useful adjunct</td></tr>
+      </tbody>
+    </table></div>
+    <div class="pearl"><div class="p-lbl">⭐ High-Yield Macrogol vs Lactulose</div><p>Lactulose is fermented by colonic bacteria → gas, bloating (problematic in elderly). Macrogol is non-fermented, not systemically absorbed, not renally cleared → preferred in opioid-induced constipation, elderly, renal impairment.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>🤧 Allergic Rhinitis — Treatment Steps</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Step</th><th>Presentation</th><th>Treatment</th></tr></thead>
+      <tbody>
+        <tr><td>Step 1</td><td>Mild intermittent symptoms</td><td>Oral antihistamine (loratadine 10mg or cetirizine 10mg OD)</td></tr>
+        <tr><td>Step 2</td><td>Moderate–severe / perennial</td><td>Intranasal corticosteroid (fluticasone propionate 50mcg per nostril BD)</td></tr>
+        <tr><td>Step 3</td><td>Ocular symptoms</td><td>Add antihistamine eye drops (ketotifen, sodium cromoglicate)</td></tr>
+      </tbody>
+    </table></div>
+    <div class="pearl"><div class="p-lbl">⏱ Onset of Intranasal Corticosteroids</div><p>Onset: 2–3 days. Full effect: <strong>2–4 weeks</strong>. Must be used REGULARLY (not PRN). Most common cause of apparent "failure" is PRN use and incorrect technique. Check technique: aim away from nasal septum.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>💊 PPI Therapy — Critical Interactions</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Issue</th><th>Detail</th></tr></thead>
+      <tbody>
+        <tr><td><span class="pill pill-red">CRITICAL</span> Omeprazole + Clopidogrel</td><td>Omeprazole is a potent <strong>CYP2C19 inhibitor</strong>. Clopidogrel is a prodrug requiring CYP2C19 for activation. Inhibition → reduced antiplatelet effect → <strong>coronary stent thrombosis risk</strong>. Prefer <strong>pantoprazole or rabeprazole</strong> (lower CYP2C19 inhibition)</td></tr>
+        <tr><td>OTC Duration Limit</td><td>OTC PPIs: <strong>max 2 weeks</strong>. Beyond 2 weeks without medical review → risk of masking Barrett's, peptic ulcer, malignancy</td></tr>
+        <tr><td>Long-term Risks</td><td>Hypomagnesaemia (chronic use >1 year), C. difficile risk, vitamin B12 malabsorption</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="card">
+    <h3>💊 Paracetamol — Hidden Accumulation & Alcohol Risk</h3>
+    <div class="pearl danger"><div class="p-lbl" style="color:var(--red);">🚨 Critical Safety Points</div>
+      <p><strong>Hidden accumulation:</strong> Many products contain paracetamol (co-codamol, Night Nurse, cold & flu remedies). Always counsel on ALL sources.<br><br>
+      <strong>Chronic alcohol use:</strong> CYP2E1 induction → more hepatotoxic NAPQI metabolite produced. Glutathione depletion → less NAPQI detoxified. Safe maximum reduced to <strong>2g/24h</strong> (or avoid entirely).<br><br>
+      <strong>Night Nurse contains promethazine</strong> (sedating antihistamine) — additive CNS depression with benzodiazepines/opioids.</p>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    <p>🎓 <strong>You have completed all 4 learning sections.</strong> You are now ready to attempt the 10 clinical assessment cases. Each case is worth <strong>1 mark</strong> (10 marks total). Read each vignette carefully before selecting your answer. After answering each question you will receive the correct answer with a full explanation and exam learning tip.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(3)">← Assessment Frameworks</button>
+    <button class="nav-btn" onclick="goTo(5)" style="background:var(--green);">▶ Begin Assessment Cases →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 5: CASES 1–5 ══ -->
+<div class="sec" id="sec-5">
+  <div class="sec-tag">Assessment — Cases 1–5</div>
+  <div class="sec-hdr"><h2>Clinical Cases 1–5</h2><p>Each case is worth <strong>1 mark</strong>. Select your answer and click <em>Submit Answer</em> to receive feedback.</p></div>
+
+  <div class="q-tracker" id="tracker-a">
+    <div class="q-dot current" id="dot-1" onclick="scrollToQ('q1')">1</div>
+    <div class="q-dot" id="dot-2" onclick="scrollToQ('q2')">2</div>
+    <div class="q-dot" id="dot-3" onclick="scrollToQ('q3')">3</div>
+    <div class="q-dot" id="dot-4" onclick="scrollToQ('q4')">4</div>
+    <div class="q-dot" id="dot-5" onclick="scrollToQ('q5')">5</div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="case-box" id="q1">
+    <div class="q-num">Case 1 of 10 · 1 Mark<span class="difficulty">★★★★☆ Advanced</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: NHS Policy &amp; Exceptions</div>
+    <div class="vignette">A GP refers a 45-year-old male to your pharmacy for counselling. He has been prescribed regular liquid paraffin as a laxative for his chronic constipation secondary to opioid analgesics for chronic non-cancer pain. His wife comes to collect the prescription and asks why the GP prescribed this rather than 'the fibre sachets from the shelf.' She mentions that constipation is listed on the NHS 35 conditions where prescribing should be avoided.</div>
+    <div class="q-stem">Which of the following BEST explains why prescribing is clinically justified in this case, consistent with NHS 2018 guidance?</div>
+    <div class="opts" id="opts-1">
+      <label class="opt"><input type="radio" name="q1" value="A"> <span><strong>A.</strong> The patient has a long-term medical condition (chronic pain) requiring treatment of the constipation as part of its ongoing management</span></label>
+      <label class="opt"><input type="radio" name="q1" value="B"> <span><strong>B.</strong> Liquid paraffin is a POM-only product and therefore cannot be purchased OTC regardless of NHS guidance</span></label>
+      <label class="opt"><input type="radio" name="q1" value="C"> <span><strong>C.</strong> The NHS guidance applies only to intermittent constipation; opioid-induced constipation is entirely outside scope of the 35-conditions list</span></label>
+      <label class="opt"><input type="radio" name="q1" value="D"> <span><strong>D.</strong> Financial hardship is the most likely exemption — bulk-forming laxatives are expensive enough to justify prescribing</span></label>
+      <label class="opt"><input type="radio" name="q1" value="E"> <span><strong>E.</strong> Liquid paraffin is ACBS-approved and its prescribing always overrides the minor ailment guidelines unconditionally</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-1" onclick="submitQ(1,'A')">Submit Answer</button>
+    <span class="marks-badge" id="mark-1"></span>
+    <div class="fb" id="fb-1"></div>
+    <div class="keypoint" id="kp-1"><strong>KEY POINT:</strong> Long-term condition exception: when a minor ailment is a direct, ongoing consequence of a chronic disease or its treatment, NHS prescribing is justified with documented clinical reasoning. Liquid paraffin is GSL/P — B is factually wrong. C misrepresents the guidance — the exception covers ongoing management needs, not exclusions by aetiology.</div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="case-box" id="q2">
+    <div class="q-num">Case 2 of 10 · 1 Mark<span class="difficulty">★★★★☆ Advanced</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Medicine Classification &amp; Reclassification</div>
+    <div class="vignette">A newly qualified pharmacist is asked during a CPD event to explain why OTC omeprazole is dosed at 10mg daily when prescription-strength dosing for conditions such as erosive oesophagitis or H. pylori eradication requires 20–40mg. She is also asked why the maximum OTC duration is limited to 2 weeks.</div>
+    <div class="q-stem">Which statement MOST accurately explains the regulatory rationale governing the lower OTC dose and duration restriction?</div>
+    <div class="opts" id="opts-2">
+      <label class="opt"><input type="radio" name="q2" value="A"> <span><strong>A.</strong> The OTC 10mg dose is maintained to preserve a commercial differential incentivising patients toward prescription therapy rather than self-management</span></label>
+      <label class="opt"><input type="radio" name="q2" value="B"> <span><strong>B.</strong> 10mg represents the full therapeutic dose for all GERD phenotypes; higher doses are used only as combination partners in antibiotic regimens</span></label>
+      <label class="opt"><input type="radio" name="q2" value="C"> <span><strong>C.</strong> The OTC dose is restricted to the minimum effective dose for the narrowest self-care indication; higher doses and longer durations require conditions demanding diagnosis and clinical supervision</span></label>
+      <label class="opt"><input type="radio" name="q2" value="D"> <span><strong>D.</strong> The MHRA mandates a different salt form for reclassified PPIs to create pharmacokinetic distinction from POM formulations</span></label>
+      <label class="opt"><input type="radio" name="q2" value="E"> <span><strong>E.</strong> 10mg dose reduces first-pass metabolism enough to prevent adverse effects including hypomagnesaemia and C. difficile risk</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-2" onclick="submitQ(2,'C')">Submit Answer</button>
+    <span class="marks-badge" id="mark-2"></span>
+    <div class="fb" id="fb-2"></div>
+    <div class="keypoint" id="kp-2"><strong>KEY POINT:</strong> OTC reclassification: lowest effective dose for narrowest self-care indication. Omeprazole 10mg OTC for short-term symptomatic GERD relief only (max 2 weeks). Conditions requiring 20–40mg (erosive oesophagitis, Barrett's, H. pylori, Zollinger-Ellison) require confirmed diagnosis and prescriber oversight. The restriction is a regulatory safety design — not commercial or pharmacokinetic.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="case-box" id="q3">
+    <div class="q-num">Case 3 of 10 · 1 Mark<span class="difficulty">★★★★★ Expert</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Clinical Assessment Frameworks Integration</div>
+    <div class="vignette">During an OSCE station, a 5th-year student is presented with a patient complaining of epigastric pain. The examiner asks: 'Which framework do you apply first, at which point do you switch, and what is your justification for the sequence?'</div>
+    <div class="q-stem">Which sequence of framework application is MOST appropriate for this community pharmacy OTC consultation?</div>
+    <div class="opts" id="opts-3">
+      <label class="opt"><input type="radio" name="q3" value="A"> <span><strong>A.</strong> Apply PQRST first to thoroughly characterise the pain; then use SOAP to document; SCHOLAR-MAC is redundant if PQRST is used comprehensively</span></label>
+      <label class="opt"><input type="radio" name="q3" value="B"> <span><strong>B.</strong> Apply SOAP as the overarching documentation structure; embed SCHOLAR-MAC within the Subjective section for OTC triage; use PQRST within SCHOLAR-MAC to characterise epigastric pain quality, radiation, and timing</span></label>
+      <label class="opt"><input type="radio" name="q3" value="C"> <span><strong>C.</strong> Complete all 10 SCHOLAR-MAC components before beginning SOAP; PQRST should be reserved for ward-based pain assessments only</span></label>
+      <label class="opt"><input type="radio" name="q3" value="D"> <span><strong>D.</strong> PQRST alone suffices for OTC consultations; the MAC component is mandatory only in secondary care where full patient records are accessible</span></label>
+      <label class="opt"><input type="radio" name="q3" value="E"> <span><strong>E.</strong> Use SOAP for documentation; embed PQRST in both Subjective AND Objective sections combined; apply MAC only if patient volunteers medication use</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-3" onclick="submitQ(3,'B')">Submit Answer</button>
+    <span class="marks-badge" id="mark-3"></span>
+    <div class="fb" id="fb-3"></div>
+    <div class="keypoint" id="kp-3"><strong>KEY POINT:</strong> Framework integration: SOAP (structure) → SCHOLAR-MAC within Subjective (OTC triage + safety screen) → PQRST within SCHOLAR-MAC for symptom depth. MAC is NEVER conditional. PQRST applies wherever a dominant symptom needs deep characterisation — not restricted to ward settings.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="case-box" id="q4">
+    <div class="q-num">Case 4 of 10 · 1 Mark<span class="difficulty">★★★★☆ Advanced</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Sunburn &amp; Photodermatoses in Pregnancy</div>
+    <div class="vignette">A 31-year-old female with confirmed polymorphic light eruption (PLE), 14 weeks pregnant, presents with mild sunburn (erythema, no blistering) on her arms after a beach trip. She asks about (i) analgesia for her sunburn pain and (ii) whether she qualifies for NHS-prescribed sunscreen and what specification to request.</div>
+    <div class="q-stem">Which combined management recommendation is MOST clinically appropriate?</div>
+    <div class="opts" id="opts-4">
+      <label class="opt"><input type="radio" name="q4" value="A"> <span><strong>A.</strong> Paracetamol for pain; recommend she purchase SPF 50+ OTC — NHS prescription is not justified as PLE symptoms are currently mild</span></label>
+      <label class="opt"><input type="radio" name="q4" value="B"> <span><strong>B.</strong> Ibuprofen 400mg for its superior anti-inflammatory effect; NHS sunscreen is appropriate for PLE but prescribing is only justified from March to September</span></label>
+      <label class="opt"><input type="radio" name="q4" value="C"> <span><strong>C.</strong> Paracetamol for pain; ACBS-approved NHS sunscreen (minimum SPF 30+ broad-spectrum UVA+UVB) is justified — PLE is an approved ACBS indication requiring year-round daily application</span></label>
+      <label class="opt"><input type="radio" name="q4" value="D"> <span><strong>D.</strong> Topical hydrocortisone 1% for erythema; NHS prescribing of sunscreen is approved only for xeroderma pigmentosum and porphyria, not PLE</span></label>
+      <label class="opt"><input type="radio" name="q4" value="E"> <span><strong>E.</strong> Paracetamol for pain; refer to GP for ACBS prescribing as community pharmacists cannot authorise ACBS items under any circumstances</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-4" onclick="submitQ(4,'C')">Submit Answer</button>
+    <span class="marks-badge" id="mark-4"></span>
+    <div class="fb" id="fb-4"></div>
+    <div class="keypoint" id="kp-4"><strong>KEY POINT:</strong> In pregnancy → paracetamol only (NSAIDs CI from 2nd trimester — premature ductus arteriosus closure risk). PLE is explicitly ACBS-approved for NHS sunscreen: minimum SPF 30+ broad-spectrum UVA+UVB. Year-round daily use required. Seasonal restriction is a common misconception. Independent prescriber pharmacists can prescribe ACBS items.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="case-box" id="q5">
+    <div class="q-num">Case 5 of 10 · 1 Mark<span class="difficulty">★★★★☆ Advanced</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Mild Acne — Benzoyl Peroxide Pharmacology</div>
+    <div class="vignette">A 19-year-old male presents requesting 'the strongest acne product available.' He has mild-to-moderate comedonal and papulopustular acne. Six weeks of salicylic acid 2% wash produced minimal response. He takes no regular medications and mentions his girlfriend used 'the bleaching gel' effectively.</div>
+    <div class="q-stem">Which pharmacist recommendation regarding benzoyl peroxide (BPO) initiation BEST reflects the evidence base?</div>
+    <div class="opts" id="opts-5">
+      <label class="opt"><input type="radio" name="q5" value="A"> <span><strong>A.</strong> Start at 10% BPO — the highest available strength maximises antibacterial effect and is justified after documented failure of 6 weeks of salicylic acid</span></label>
+      <label class="opt"><input type="radio" name="q5" value="B"> <span><strong>B.</strong> Start at 2.5% BPO once daily; escalate to 5% after 2–4 weeks if tolerated; evidence shows 2.5% and 10% have equivalent antibacterial efficacy with significantly less irritation at lower concentrations</span></label>
+      <label class="opt"><input type="radio" name="q5" value="C"> <span><strong>C.</strong> Switch from BPO to nicotinamide 4% first-line — BPO is more appropriate for moderate-to-severe cystic acne, not mild-moderate comedonal disease</span></label>
+      <label class="opt"><input type="radio" name="q5" value="D"> <span><strong>D.</strong> Co-prescribe an emollient barrier cream alongside 10% BPO immediately — higher concentrations provide meaningfully superior clinical outcomes when skin barrier is protected</span></label>
+      <label class="opt"><input type="radio" name="q5" value="E"> <span><strong>E.</strong> BPO lacks keratolytic activity and is therefore unsuitable for comedonal acne; salicylic acid 2% is the superior agent for non-inflammatory comedones</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-5" onclick="submitQ(5,'B')">Submit Answer</button>
+    <span class="marks-badge" id="mark-5"></span>
+    <div class="fb" id="fb-5"></div>
+    <div class="keypoint" id="kp-5"><strong>KEY POINT:</strong> BPO 2.5% = 10% antibacterially (equivalent efficacy). Start low, escalate for tolerability — optimises long-term adherence. BPO possesses mild keratolytic activity in addition to antibacterial and anti-inflammatory mechanisms — effective for both comedonal AND inflammatory acne. 'Strongest first' rationale is not evidence-based.</div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(4)">← Conditions Overview</button>
+    <button class="nav-btn" onclick="goTo(6)">Cases 6–10 →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 6: CASES 6–10 ══ -->
+<div class="sec" id="sec-6">
+  <div class="sec-tag">Assessment — Cases 6–10</div>
+  <div class="sec-hdr"><h2>Clinical Cases 6–10</h2><p>Final 5 cases. After completing all 10 cases proceed to <strong>Submit &amp; Results</strong>.</p></div>
+
+  <div class="q-tracker" id="tracker-b">
+    <div class="q-dot" id="dot-6" onclick="scrollToQ('q6')">6</div>
+    <div class="q-dot" id="dot-7" onclick="scrollToQ('q7')">7</div>
+    <div class="q-dot" id="dot-8" onclick="scrollToQ('q8')">8</div>
+    <div class="q-dot" id="dot-9" onclick="scrollToQ('q9')">9</div>
+    <div class="q-dot" id="dot-10" onclick="scrollToQ('q10')">10</div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="case-box" id="q6">
+    <div class="q-num">Case 6 of 10 · 1 Mark<span class="difficulty">★★★★★ Expert</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Laxative Pharmacology — Opioid-Induced Constipation</div>
+    <div class="vignette">A 78-year-old female nursing home resident receives lactulose 30ml BD for 6 weeks for persistent severe constipation. She continues to strain daily. Medications: oxycodone 10mg SR BD, amlodipine 5mg OD, omeprazole 20mg OD. eGFR 48 ml/min.</div>
+    <div class="q-stem">Which laxative adjustment is MOST appropriate, with the strongest pharmacological rationale?</div>
+    <div class="opts" id="opts-6">
+      <label class="opt"><input type="radio" name="q6" value="A"> <span><strong>A.</strong> Add bisacodyl 10mg nightly — stimulant laxatives act synergistically with osmotic agents and are safe for long-term combination use in elderly patients</span></label>
+      <label class="opt"><input type="radio" name="q6" value="B"> <span><strong>B.</strong> Switch lactulose to macrogol (polyethylene glycol); macrogol is non-fermented, not renally cleared, and has superior efficacy and tolerability in opioid-induced constipation and renal impairment</span></label>
+      <label class="opt"><input type="radio" name="q6" value="C"> <span><strong>C.</strong> Increase lactulose to 50ml TDS — greater osmotic load will overcome opioid-induced colonic hypomotility in a dose-dependent fashion</span></label>
+      <label class="opt"><input type="radio" name="q6" value="D"> <span><strong>D.</strong> Add ispaghula husk twice daily — bulk-forming agents are most effective for opioid-induced constipation and are safe in mild renal impairment</span></label>
+      <label class="opt"><input type="radio" name="q6" value="E"> <span><strong>E.</strong> Prescribe naloxegol as first-line — it is a peripherally acting mu-opioid receptor antagonist appropriate for long-term use in this context</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-6" onclick="submitQ(6,'B')">Submit Answer</button>
+    <span class="marks-badge" id="mark-6"></span>
+    <div class="fb" id="fb-6"></div>
+    <div class="keypoint" id="kp-6"><strong>KEY POINT:</strong> Macrogol: non-fermented osmotic — no gas/bloating. Not systemically absorbed, not renally cleared → safe with eGFR 48. Superior to lactulose in elderly and opioid-induced constipation. Stimulant laxatives: max ~1 week (colonic atony risk). Bulk-forming agents require adequate fluid and peristalsis — ineffective in opioid hypomotility. Naloxegol = POM-only.</div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="case-box" id="q7">
+    <div class="q-num">Case 7 of 10 · 1 Mark<span class="difficulty">★★★★★ Expert</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Antibiotic-Associated Diarrhoea &amp; C. difficile Risk</div>
+    <div class="vignette">A 67-year-old male, 10 days post-hip replacement, presents with profuse watery diarrhoea (8–10 episodes/day) starting 3 days ago, low-grade fever (37.8°C), and abdominal cramping. He completed co-amoxiclav 625mg TDS for 7 days (post-operative prophylaxis) 5 days ago. He requests loperamide to control symptoms before an upcoming family event.</div>
+    <div class="q-stem">What is the MOST appropriate pharmacist intervention?</div>
+    <div class="opts" id="opts-7">
+      <label class="opt"><input type="radio" name="q7" value="A"> <span><strong>A.</strong> Dispense loperamide 4mg starter dose with dietary advice; post-antibiotic diarrhoea is usually self-limiting within 7–10 days of completing antibiotics</span></label>
+      <label class="opt"><input type="radio" name="q7" value="B"> <span><strong>B.</strong> Recommend high-dose Saccharomyces boulardii or Lactobacillus — systematic evidence supports probiotics as first-line for antibiotic-associated diarrhoea in elderly</span></label>
+      <label class="opt"><input type="radio" name="q7" value="C"> <span><strong>C.</strong> Refuse loperamide; urgently refer to GP or emergency services — clinical features are consistent with suspected Clostridioides difficile infection requiring medical assessment</span></label>
+      <label class="opt"><input type="radio" name="q7" value="D"> <span><strong>D.</strong> Recommend ORS only; C. difficile can only be confirmed in hospital and without microbiological confirmation, empirical loperamide alongside ORS is acceptable</span></label>
+      <label class="opt"><input type="radio" name="q7" value="E"> <span><strong>E.</strong> Recommend zinc supplementation and ORS; systematic review evidence supports zinc for antibiotic-associated diarrhoea in adults over 60</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-7" onclick="submitQ(7,'C')">Submit Answer</button>
+    <span class="marks-badge" id="mark-7"></span>
+    <div class="fb" id="fb-7"></div>
+    <div class="keypoint" id="kp-7"><strong>KEY POINT:</strong> Post-antibiotic + profuse diarrhoea + fever + elderly + post-surgical = C. difficile until proven otherwise. Loperamide ABSOLUTELY contraindicated — prevents toxin clearance → toxic megacolon risk. Treatment is fidaxomicin (preferred) or vancomycin. Probiotics have evidence for CDI prevention, NOT acute treatment. ORS alone without referral is insufficient.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="case-box" id="q8">
+    <div class="q-num">Case 8 of 10 · 1 Mark<span class="difficulty">★★★★☆ Advanced</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Allergic Rhinitis — Treatment Optimisation</div>
+    <div class="vignette">A 29-year-old with moderate persistent house dust mite allergic rhinitis began fluticasone propionate 50mcg per nostril BD four days ago. She returns saying 'it's not working.' She also has severely itchy, watery eyes. Her only other medication is the combined oral contraceptive pill (COCP).</div>
+    <div class="q-stem">Which response to her consultation is MOST clinically accurate?</div>
+    <div class="opts" id="opts-8">
+      <label class="opt"><input type="radio" name="q8" value="A"> <span><strong>A.</strong> Fluticasone propionate is not appropriate for house dust mite allergy; switch to budesonide which has superior evidence for perennial rhinitis</span></label>
+      <label class="opt"><input type="radio" name="q8" value="B"> <span><strong>B.</strong> Fluticasone has failed; refer to GP for oral corticosteroid therapy for inadequately controlled perennial rhinitis at 4 days</span></label>
+      <label class="opt"><input type="radio" name="q8" value="C"> <span><strong>C.</strong> Fluticasone requires 2–3 days for onset but 2–4 weeks for full effect; continue REGULARLY; add antihistamine eye drops for ocular symptoms; check spray technique (aim away from nasal septum)</span></label>
+      <label class="opt"><input type="radio" name="q8" value="D"> <span><strong>D.</strong> Double the dose to 100mcg per nostril BD immediately to accelerate onset; ocular symptoms indicate need for systemic rather than topical agents</span></label>
+      <label class="opt"><input type="radio" name="q8" value="E"> <span><strong>E.</strong> The COCP reduces fluticasone efficacy via competitive oestrogen-receptor binding; recommend switching to a non-hormonal contraceptive</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-8" onclick="submitQ(8,'C')">Submit Answer</button>
+    <span class="marks-badge" id="mark-8"></span>
+    <div class="fb" id="fb-8"></div>
+    <div class="keypoint" id="kp-8"><strong>KEY POINT:</strong> Intranasal corticosteroids: 2–4 weeks for full effect — must be used REGULARLY, not PRN. Most common cause of apparent failure = PRN use + incorrect technique. Technique check is mandatory. Ketotifen or cromoglicate eye drops for ocular symptoms. No clinically significant pharmacokinetic interaction between nasal fluticasone (minimal systemic absorption) and COCPs.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="case-box" id="q9">
+    <div class="q-num">Case 9 of 10 · 1 Mark<span class="difficulty">★★★★★ Expert</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: PPI Pharmacology, Drug Interactions &amp; OTC Duration</div>
+    <div class="vignette">A 55-year-old male has been purchasing OTC omeprazole 10mg daily for 9 months. He takes clopidogrel 75mg daily (post-coronary stent) and amlodipine 5mg. Symptoms recur before 2 weeks in each course. He asks you to 'make it stronger.'</div>
+    <div class="q-stem">Which combination of clinical concerns is MOST comprehensively and accurately identified?</div>
+    <div class="opts" id="opts-9">
+      <label class="opt"><input type="radio" name="q9" value="A"> <span><strong>A.</strong> OTC PPI duration exceeded (&gt;2 weeks requires medical review); omeprazole inhibits CYP2C19, reducing clopidogrel activation to its thienopyridyl active metabolite — increasing coronary stent thrombosis risk</span></label>
+      <label class="opt"><input type="radio" name="q9" value="B"> <span><strong>B.</strong> Amlodipine causes LOS relaxation worsening GERD; increasing omeprazole to 20mg OTC addresses symptom breakthrough and the drug interaction simultaneously</span></label>
+      <label class="opt"><input type="radio" name="q9" value="C"> <span><strong>C.</strong> The primary concern is vitamin B12 malabsorption over 9 months; the omeprazole-clopidogrel interaction is not clinically relevant at the 10mg OTC dose</span></label>
+      <label class="opt"><input type="radio" name="q9" value="D"> <span><strong>D.</strong> Symptom recurrence indicates non-compliance; doubling to 20mg provides adequate acid suppression, and OTC use up to 4 weeks is acceptable in persistent GERD</span></label>
+      <label class="opt"><input type="radio" name="q9" value="E"> <span><strong>E.</strong> Refer for H. pylori testing only; eradication should precede any prescribing decision before considering the dose or interaction issues</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-9" onclick="submitQ(9,'A')">Submit Answer</button>
+    <span class="marks-badge" id="mark-9"></span>
+    <div class="fb" id="fb-9"></div>
+    <div class="keypoint" id="kp-9"><strong>KEY POINT:</strong> Omeprazole + clopidogrel = CYP2C19 inhibition → reduced clopidogrel activation → reduced antiplatelet effect → stent thrombosis risk (potentially life-threatening). Prefer pantoprazole or rabeprazole (lower CYP2C19 inhibition). OTC PPI >2 weeks without review = clinically inappropriate — persistent/recurrent symptoms in a 55-year-old need investigation.</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="case-box" id="q10">
+    <div class="q-num">Case 10 of 10 · 1 Mark<span class="difficulty">★★★★★ Expert</span></div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;">Topic: Paracetamol Toxicology &amp; Hidden Accumulation</div>
+    <div class="vignette">A 34-year-old male with chronic low back pain and 15-year history of heavy alcohol use (&gt;14 units/day) is purchasing: paracetamol 1g (32-tab pack), Night Nurse liquid (paracetamol 1g per 20ml dose), and asks to also take co-codamol 8/500 at night. Only other medication: diazepam 5mg PRN. He states he plans to take everything at maximum doses.</div>
+    <div class="q-stem">Which clinical risk assessment MOST accurately and comprehensively characterises this consultation?</div>
+    <div class="opts" id="opts-10">
+      <label class="opt"><input type="radio" name="q10" value="A"> <span><strong>A.</strong> Safe provided total paracetamol remains under 4g/24h; chronic alcohol is only dangerous in acute overdose, not with therapeutic doses taken regularly</span></label>
+      <label class="opt"><input type="radio" name="q10" value="B"> <span><strong>B.</strong> Diazepam combined with Night Nurse antihistamine presents the primary sedation risk; the paracetamol component is within safe limits if products are used at separately spaced intervals</span></label>
+      <label class="opt"><input type="radio" name="q10" value="C"> <span><strong>C.</strong> Multiple concurrent risks: (i) high likelihood of paracetamol exceeding 4g/24h across three sources; (ii) chronic alcohol use causes hepatotoxicity at standard therapeutic doses via CYP2E1 induction and glutathione depletion — max safe dose is 2g/24h; (iii) CNS depression from diazepam plus promethazine (Night Nurse)</span></label>
+      <label class="opt"><input type="radio" name="q10" value="D"> <span><strong>D.</strong> Primary concern is codeine in co-codamol — chronic alcohol upregulates CYP2D6, accelerating codeine-to-morphine conversion and increasing respiratory depression risk</span></label>
+      <label class="opt"><input type="radio" name="q10" value="E"> <span><strong>E.</strong> Refer the patient for alcohol dependency services; the analgesia combination itself is safe under pharmacist supervision with routine therapeutic monitoring</span></label>
+    </div>
+    <button class="submit-q-btn" id="btn-10" onclick="submitQ(10,'C')">Submit Answer</button>
+    <span class="marks-badge" id="mark-10"></span>
+    <div class="fb" id="fb-10"></div>
+    <div class="keypoint" id="kp-10"><strong>KEY POINT:</strong> Chronic alcohol: CYP2E1 induction → more NAPQI (hepatotoxic metabolite) + glutathione depletion → hepatotoxicity at STANDARD therapeutic doses. Safe maximum = 2g/24h (or avoid entirely). Night Nurse = paracetamol + promethazine (sedating antihistamine) → additive CNS depression with diazepam. Hidden accumulation: always counsel on ALL paracetamol-containing products.</div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(5)">← Cases 1–5</button>
+    <button class="nav-btn" onclick="goTo(7)" style="background:var(--green);">📤 Submit & View Results →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 7: SUBMIT & RESULTS ══ -->
+<div class="sec" id="sec-7">
+  <div class="sec-tag">Final Submission</div>
+  <div class="sec-hdr"><h2>Results &amp; Submission</h2><p>Review your score below, then submit your responses to the instructor's database.</p></div>
+
+  <div class="submit-panel" id="results-panel">
+    <div id="res-student-info" style="font-size:14px;opacity:.8;margin-bottom:12px;"></div>
+    <div class="score-big" id="res-score">—</div>
+    <div class="score-sub" id="res-sub">Complete all 10 cases to see your score</div>
+    <div class="score-detail">
+      <div class="score-item"><div class="val" id="res-correct">—</div><div class="lbl">Correct Answers</div></div>
+      <div class="score-item"><div class="val" id="res-marks">—</div><div class="lbl">Marks Earned</div></div>
+      <div class="score-item"><div class="val" id="res-pct">—</div><div class="lbl">Percentage</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📊 Answer Summary</h3>
+    <div class="tbl-wrap">
+      <table id="summary-table">
+        <thead><tr><th>Case</th><th>Topic</th><th>Your Answer</th><th>Correct</th><th>Marks</th><th>Status</th></tr></thead>
+        <tbody id="summary-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>📤 Submit Responses to Instructor</h3>
+    <p style="font-size:13.5px;line-height:1.7;margin-bottom:12px;">Your results will be submitted to the course Google Sheet. Ensure your student ID is correct before submitting. You can only submit once per session.</p>
+    <div id="submit-status" class="status-msg pending" style="display:block;">⏳ Enter your Google Apps Script URL in the Setup Guide (Section 8) first, then submit here.</div>
+    <div style="margin-top:14px;">
+      <button class="submit-final-btn" id="final-submit-btn" onclick="submitToGoogleSheets()">📤 Submit to Google Sheets</button>
+      <div id="submit-result" class="status-msg" style="margin-top:12px;"></div>
+    </div>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(6)">← Cases 6–10</button>
+    <button class="nav-btn" onclick="goTo(8)">⚙ Setup Guide →</button>
+  </div>
+</div>
+
+<!-- ══ SEC 8: SETUP GUIDE ══ -->
+<div class="sec" id="sec-8">
+  <div class="sec-tag">Instructor Setup Guide</div>
+  <div class="sec-hdr"><h2>Google Sheets Submission Setup</h2><p>One-time setup. Estimated time: <strong>10–15 minutes</strong>. Free, no backend server required.</p></div>
+
+  <div class="card" style="border:2px solid var(--amber);">
+    <h3>🏗 Architecture Overview</h3>
+    <p><strong>How it works:</strong> The HTML module runs entirely in the student's browser → when a student clicks "Submit", it sends their data as a POST request to a <strong>Google Apps Script Web App URL</strong> you create → the script writes directly into your Google Sheet → you see all student submissions in real-time with automatic marks calculated.</p>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;text-align:center;">
+      <div style="background:#EEF3FF;border-radius:8px;padding:14px;"><div style="font-size:22px;">🌐</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Student Browser</div><div style="font-size:11px;color:var(--muted);">Completes module, submits answers</div></div>
+      <div style="background:#F0FDFA;border-radius:8px;padding:14px;"><div style="font-size:22px;">⚙️</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Apps Script Web App</div><div style="font-size:11px;color:var(--muted);">Your free Google automation script</div></div>
+      <div style="background:#F0FDF4;border-radius:8px;padding:14px;"><div style="font-size:22px;">📊</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Google Sheet</div><div style="font-size:11px;color:var(--muted);">Auto-recorded results + marks</div></div>
+    </div>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">1</span>Create a Google Sheet</div>
+    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
+      <li>Go to <strong>sheets.google.com</strong> and create a new spreadsheet</li>
+      <li>Name it: <code>NHS Self-Care Module Submissions</code></li>
+      <li>In Row 1, create these column headers (exactly):<br>
+        <code>Timestamp | StudentID | StudentName | Section | Email | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 | CorrectCount | TotalMarks | Percentage | Q1_Correct | Q2_Correct | Q3_Correct | Q4_Correct | Q5_Correct | Q6_Correct | Q7_Correct | Q8_Correct | Q9_Correct | Q10_Correct</code></li>
+    </ol>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">2</span>Create the Apps Script</div>
+    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
+      <li>In your Google Sheet, click <strong>Extensions → Apps Script</strong></li>
+      <li>Delete any existing code and paste the following:</li>
+    </ol>
+    <pre>function doPost(e) {
+  try {
+    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+    var data = JSON.parse(e.postData.contents);
+    var answers = data.answers; // {Q1:"A", Q2:"C", ...}
+    var correct = {Q1:"A",Q2:"C",Q3:"B",Q4:"C",Q5:"B",
+                   Q6:"B",Q7:"C",Q8:"C",Q9:"A",Q10:"C"};
+    
+    var correctCount = 0;
+    var qCorrectArr = [];
+    for (var i = 1; i <= 10; i++) {
+      var key = "Q" + i;
+      var isRight = (answers[key] === correct[key]) ? 1 : 0;
+      correctCount += isRight;
+      qCorrectArr.push(isRight ? "✓" : "✗ (" + correct[key] + ")");
+    }
+    var marks = correctCount * 1;
+    var pct = Math.round((marks / 10) * 100);
+    
+    var row = [
+      new Date(),
+      data.studentId,
+      data.studentName,
+      data.section || "",
+      data.email || "",
+      answers.Q1||"", answers.Q2||"", answers.Q3||"",
+      answers.Q4||"", answers.Q5||"", answers.Q6||"",
+      answers.Q7||"", answers.Q8||"", answers.Q9||"",
+      answers.Q10||"",
+      correctCount,
+      marks,
+      pct + "%"
+    ].concat(qCorrectArr);
+    
+    sheet.appendRow(row);
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({
+        success: true,
+        marks: marks,
+        correct: correctCount,
+        percentage: pct
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({success:false, error:err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  return ContentService
+    .createTextOutput("NHS Self-Care Module - Submission endpoint active")
+    .setMimeType(ContentService.MimeType.TEXT);
+}</pre>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">3</span>Deploy as Web App</div>
+    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
+      <li>Click <strong>Deploy → New deployment</strong></li>
+      <li>Select type: <strong>Web app</strong></li>
+      <li>Description: <code>NHS Module Submission</code></li>
+      <li>Execute as: <strong>Me (your Google account)</strong></li>
+      <li>Who has access: <strong>Anyone</strong> ← Important!</li>
+      <li>Click <strong>Deploy</strong> → Authorise when prompted</li>
+      <li><strong>Copy the Web App URL</strong> (looks like: <code>https://script.google.com/macros/s/AKfy.../exec</code>)</li>
+    </ol>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">4</span>Enter the URL Below</div>
+    <p style="font-size:14px;margin-bottom:10px;">Paste your Apps Script Web App URL here. This is saved in the module for all student submissions.</p>
+    <div class="url-input-grp">
+      <input type="text" class="url-input" id="apps-script-url" placeholder="https://script.google.com/macros/s/YOUR_ID/exec" />
+      <button class="save-url-btn" onclick="saveScriptUrl()">Save URL</button>
+    </div>
+    <div class="status-msg" id="url-save-status"></div>
+    <div class="pearl" style="margin-top:14px;">
+      <div class="p-lbl">💡 Testing</div>
+      <p>After saving the URL, go back to the <strong>Submit &amp; Results</strong> section and test with a student submission. Check your Google Sheet to confirm data appears. Each row = one student submission with automatic marks calculation.</p>
+    </div>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">5</span>Share with Students</div>
+    <p style="font-size:14px;line-height:1.7;">Share the HTML file with students via:</p>
+    <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
+      <li>Upload to <strong>Moodle / Blackboard</strong> as a course resource</li>
+      <li>Share via <strong>Microsoft Teams</strong> file share</li>
+      <li>Host on <strong>GitHub Pages</strong> (free) for a permanent URL</li>
+      <li>Share via <strong>Google Drive</strong> with download link</li>
+    </ul>
+    <div class="pearl warn"><div class="p-lbl" style="color:#B45309;">⚠️ Important Note on CORS</div>
+      <p>When students submit from a local file (file://), browsers may block the request. <strong>Recommended:</strong> Host the HTML on a server (even GitHub Pages free hosting) so submissions work reliably. Alternatively, Google Forms as a backup submission sheet can be linked.</p>
+    </div>
+  </div>
+
+  <div class="setup-step">
+    <div class="setup-step-hdr"><span class="step-num">6</span>Google Sheets Auto-Grading Formula (Optional)</div>
+    <p style="font-size:14px;margin-bottom:10px;">Add this formula in column R (or wherever you want a grade band) in your sheet:</p>
+    <pre>=IF(R2&gt;=90,"A+ (Distinction)",IF(R2&gt;=80,"A (Excellent)",IF(R2&gt;=70,"B (Good)",IF(R2&gt;=60,"C (Pass)","D (Needs Review)"))))</pre>
+    <p style="font-size:13px;color:var(--muted);margin-top:8px;">Where R2 contains the Percentage value. Replace column letters as needed.</p>
+  </div>
+
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="goTo(7)">← Results</button>
+    <button class="nav-btn" onclick="goTo(0)">🏠 Back to Start</button>
+  </div>
+</div>
+
+</main>
+</div>
+
+<script>
+// ── STATE ──
+let student = {name:'', id:'', section:'', email:''};
+let answers = {};
+let answered = {};
+let scriptUrl = localStorage.getItem('nhsScriptUrl') || '';
+if(scriptUrl) document.getElementById('apps-script-url') && (document.getElementById('apps-script-url').value = scriptUrl);
+
+const CORRECT = {1:'A',2:'C',3:'B',4:'C',5:'B',6:'B',7:'C',8:'C',9:'A',10:'C'};
+const TOPICS = {
+  1:'NHS Policy & Exceptions',2:'Medicine Classification',3:'Assessment Frameworks',
+  4:'Sunburn & Photodermatoses',5:'Mild Acne — BPO',6:'Laxative Pharmacology',
+  7:'Antibiotic-Assoc. Diarrhoea',8:'Allergic Rhinitis',9:'PPI Drug Interactions',10:'Paracetamol Toxicology'
+};
+const EXPLANATIONS = {
+  1:'The patient has opioid-induced constipation — a direct ongoing consequence of his chronic pain management. This is the classic "long-term condition exception" under NHS 2018 guidance.',
+  2:'OTC reclassification uses the minimum effective dose for the narrowest self-care indication. Conditions requiring higher doses need confirmed diagnosis and prescriber oversight.',
+  3:'SOAP provides the overarching structure → SCHOLAR-MAC sits within Subjective for OTC triage → PQRST is embedded within SCHOLAR-MAC for granular pain characterisation. MAC is never conditional.',
+  4:'Paracetamol is the only safe analgesic in pregnancy. PLE is ACBS-approved for NHS sunscreen (SPF 30+ year-round). Seasonal restriction is a misconception.',
+  5:'BPO 2.5% and 10% have equivalent antibacterial efficacy. Start low to optimise tolerability and adherence. BPO also has mild keratolytic activity — effective for both comedonal and inflammatory acne.',
+  6:'Macrogol is non-fermented (no gas), not renally cleared, superior in elderly/opioid-induced constipation vs lactulose. Stimulant laxatives: max ~1 week. Bulk-forming agents require peristalsis — ineffective in opioid hypomotility.',
+  7:'Multiple CDI risk factors present. Loperamide is absolutely contraindicated — prevents toxin clearance → toxic megacolon. Urgent referral required immediately.',
+  8:'Intranasal corticosteroids require 2–4 weeks for full effect. Must be used regularly. Technique check is mandatory. Antihistamine eye drops for ocular symptoms. No COCP interaction.',
+  9:'Two critical issues: (1) OTC PPI >2 weeks without review; (2) Omeprazole inhibits CYP2C19 → reduced clopidogrel activation → stent thrombosis risk. Prefer pantoprazole/rabeprazole.',
+  10:'Three concurrent hazards: paracetamol accumulation across three sources; chronic alcohol = CYP2E1 induction + glutathione depletion → hepatotoxicity at therapeutic doses (max 2g/24h); promethazine (Night Nurse) + diazepam = CNS depression.'
+};
+
+// ── NAVIGATION ──
+function goTo(idx) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-i').forEach(n => n.classList.remove('active'));
+  document.getElementById('sec-' + idx).classList.add('active');
+  document.getElementById('nav-' + idx).classList.add('active');
+  for(let i=0;i<idx;i++) document.getElementById('nav-'+i).classList.add('done');
+  updateProgress(idx);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(idx === 7) buildResults();
+}
+
+function updateProgress(idx) {
+  document.getElementById('pbar').style.width = Math.round((idx/8)*100) + '%';
+}
+
+// ── REGISTRATION ──
+function startModule() {
+  const n = document.getElementById('stu-name').value.trim();
+  const id = document.getElementById('stu-id').value.trim();
+  const err = document.getElementById('reg-err');
+  if(!n || !id) { err.textContent='Please enter your Full Name and Student ID.'; err.style.display='block'; return; }
+  err.style.display='none';
+  student.name = n; student.id = id;
+  student.section = document.getElementById('stu-section').value.trim();
+  student.email = document.getElementById('stu-email').value.trim();
+  document.getElementById('student-name-display').textContent = n + ' · ' + id;
+  goTo(1);
+}
+
+// ── MCQ ENGINE ──
+function submitQ(qNum, correctAns) {
+  const sel = document.querySelector('input[name="q'+qNum+'"]:checked');
+  if(!sel) { alert('Please select an answer before submitting.'); return; }
+  const val = sel.value;
+  answers['Q'+qNum] = val;
+  answered[qNum] = val;
+  const isRight = val === correctAns;
+
+  // Disable options
+  document.querySelectorAll('input[name="q'+qNum+'"]').forEach(o => {
+    o.disabled = true;
+    const optDiv = o.closest('.opt');
+    if(o.value === correctAns) optDiv.classList.add('correct');
+    else if(o.value === val && !isRight) optDiv.classList.add('wrong');
+  });
+
+  // Feedback
+  const fb = document.getElementById('fb-'+qNum);
+  fb.className = 'fb show ' + (isRight ? 'ok' : 'nope');
+  fb.innerHTML = isRight
+    ? '<strong>✅ Correct!</strong> Well done — this is a challenging case requiring synthesis of multiple pharmacological concepts.'
+    : '<strong>❌ Incorrect.</strong> The correct answer is <strong>' + correctAns + '</strong>. ' + EXPLANATIONS[qNum];
+
+  // Key point
+  const kp = document.getElementById('kp-'+qNum);
+  kp.classList.add('show');
+
+  // Marks badge
+  const mark = document.getElementById('mark-'+qNum);
+  mark.textContent = isRight ? '+1 mark ✓' : '0 marks ✗';
+  mark.className = 'marks-badge show ' + (isRight ? 'correct-mark' : 'wrong-mark');
+
+  // Disable submit button
+  document.getElementById('btn-'+qNum).disabled = true;
+  document.getElementById('btn-'+qNum).style.background = '#94A3B8';
+
+  // Update dot tracker
+  const dot = document.getElementById('dot-'+qNum);
+  if(dot) dot.className = 'q-dot ' + (isRight ? 'answered-correct' : 'answered-wrong');
+}
+
+function scrollToQ(id) {
+  document.getElementById(id).scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// ── RESULTS ──
+function buildResults() {
+  const correct = Object.entries(answers).filter(([k,v]) => v === CORRECT[parseInt(k.slice(1))]).length;
+  const total = Object.keys(answers).length;
+  const marks = correct * 1;
+  const pct = total > 0 ? Math.round((marks/10)*100) : 0;
+
+  document.getElementById('res-student-info').textContent = student.name + ' · ID: ' + student.id + (student.section ? ' · ' + student.section : '');
+  document.getElementById('res-score').textContent = marks.toFixed(0) + ' / 10';
+  document.getElementById('res-correct').textContent = correct + '/10';
+  document.getElementById('res-marks').textContent = marks.toFixed(0);
+  document.getElementById('res-pct').textContent = pct + '%';
+
+  let grade = pct >= 90 ? 'A+ Distinction' : pct >= 80 ? 'A Excellent' : pct >= 70 ? 'B Good' : pct >= 60 ? 'C Pass' : 'D Needs Review';
+  document.getElementById('res-sub').textContent = 'Grade: ' + grade + ' · Questions answered: ' + total + '/10';
+
+  // Summary table
+  const tbody = document.getElementById('summary-body');
+  tbody.innerHTML = '';
+  for(let q=1;q<=10;q++) {
+    const a = answers['Q'+q] || '—';
+    const corr = CORRECT[q];
+    const right = a === corr;
+    const m = right ? '1' : (a === '—' ? '0' : '0');
+    tbody.innerHTML += `<tr>
+      <td>Q${q}</td><td>${TOPICS[q]}</td>
+      <td><strong>${a}</strong></td><td>${corr}</td>
+      <td>${m}</td>
+      <td>${right ? '<span class="pill pill-green">✓ Correct</span>' : (a==='—' ? '<span class="pill pill-amber">Not answered</span>' : '<span class="pill pill-red">✗ Wrong</span>')}</td>
+    </tr>`;
+  }
+
+  // Script URL check
+  const su = localStorage.getItem('nhsScriptUrl') || scriptUrl;
+  if(!su) {
+    document.getElementById('submit-status').className = 'status-msg pending';
+    document.getElementById('submit-status').textContent = '⚠️ No submission URL configured. See Setup Guide (Section 8) to configure Google Sheets integration.';
+    document.getElementById('submit-status').style.display = 'block';
+  } else {
+    document.getElementById('submit-status').className = 'status-msg ok';
+    document.getElementById('submit-status').textContent = '✅ Submission endpoint configured. Click "Submit to Google Sheets" when ready.';
+    document.getElementById('submit-status').style.display = 'block';
+  }
+}
+
+// ── GOOGLE SHEETS SUBMISSION ──
+async function submitToGoogleSheets() {
+  const url = localStorage.getItem('nhsScriptUrl') || scriptUrl;
+  if(!url) {
+    document.getElementById('submit-result').className = 'status-msg err';
+    document.getElementById('submit-result').textContent = '❌ No submission URL configured. Please complete setup in Section 8.';
+    document.getElementById('submit-result').style.display = 'block';
+    return;
+  }
+  if(Object.keys(answers).length === 0) {
+    document.getElementById('submit-result').className = 'status-msg err';
+    document.getElementById('submit-result').textContent = '❌ No answers recorded. Please complete the cases before submitting.';
+    document.getElementById('submit-result').style.display = 'block';
+    return;
+  }
+
+  const btn = document.getElementById('final-submit-btn');
+  btn.disabled = true;
+  btn.textContent = '⏳ Submitting...';
+
+  document.getElementById('submit-result').className = 'status-msg pending';
+  document.getElementById('submit-result').textContent = '⏳ Submitting your responses...';
+  document.getElementById('submit-result').style.display = 'block';
+
+  const payload = {
+    studentId: student.id,
+    studentName: student.name,
+    section: student.section,
+    email: student.email,
+    answers: answers,
+    timestamp: new Date().toISOString()
+  };
+
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload),
+      mode: 'no-cors'
+    });
+    // no-cors means we can't read the response, but request was sent
+    document.getElementById('submit-result').className = 'status-msg ok';
+    document.getElementById('submit-result').innerHTML = '✅ <strong>Submitted successfully!</strong> Your responses have been recorded. Please take a screenshot of your results for your records.';
+    btn.textContent = '✅ Submitted';
+  } catch(err) {
+    document.getElementById('submit-result').className = 'status-msg err';
+    document.getElementById('submit-result').textContent = '❌ Submission failed: ' + err.message + '. Please contact your instructor and provide your Student ID and answers.';
+    btn.disabled = false;
+    btn.textContent = '📤 Retry Submission';
+  }
+}
+
+// ── SETUP GUIDE ──
+function saveScriptUrl() {
+  const url = document.getElementById('apps-script-url').value.trim();
+  const st = document.getElementById('url-save-status');
+  if(!url || !url.includes('script.google.com')) {
+    st.className = 'status-msg err'; st.textContent = '❌ Please enter a valid Google Apps Script URL.'; st.style.display='block'; return;
+  }
+  scriptUrl = url;
+  localStorage.setItem('nhsScriptUrl', url);
+  st.className = 'status-msg ok'; st.textContent = '✅ URL saved! Students can now submit their responses.'; st.style.display='block';
+}
+
+// ── DOCX DOWNLOAD ──
+function downloadDocx() {
+  const b64 = "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";
+  if(!b64 || b64 === "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") { alert("DOCX not embedded in this version."); return; }
+  const bin = atob(b64);
+  const bytes = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+  const blob = new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.wordprocessingml.document'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'NHS_SelfCare_AdvancedMCQ_Module.docx'; a.click();
+}
+
+// Load saved URL on startup
+window.onload = function() {
+  const saved = localStorage.getItem('nhsScriptUrl');
+  if(saved && document.getElementById('apps-script-url')) {
+    document.getElementById('apps-script-url').value = saved;
+    scriptUrl = saved;
+  }
+};
+</script>
+</body>
+</html>
