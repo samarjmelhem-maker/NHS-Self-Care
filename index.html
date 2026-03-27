@@ -210,7 +210,7 @@ pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12
   <div class="nav-i" onclick="goTo(6)" id="nav-6"><div class="nav-dot">📝</div><span>Cases 6–10</span></div>
   <div class="nav-sep"></div>
   <div class="nav-i" onclick="goTo(7)" id="nav-7"><div class="nav-dot">📤</div><span>Submit & Results</span></div>
-  <div class="nav-i" onclick="goTo(8)" id="nav-8"><div class="nav-dot">⚙</div><span>Setup Guide</span></div>
+
 </aside>
 
 <main>
@@ -815,7 +815,7 @@ pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12
   <div class="card">
     <h3>📤 Submit Responses to Instructor</h3>
     <p style="font-size:13.5px;line-height:1.7;margin-bottom:12px;">Your results will be submitted to the course Google Sheet. Ensure your student ID is correct before submitting. You can only submit once per session.</p>
-    <div id="submit-status" class="status-msg pending" style="display:block;">⏳ Enter your Google Apps Script URL in the Setup Guide (Section 8) first, then submit here.</div>
+    <div id="submit-status" class="status-msg pending" style="display:block;">⏳ Enter your Google Apps Script URL below, then click Submit.</div>
     <div style="margin-top:14px;">
       <button class="submit-final-btn" id="final-submit-btn" onclick="submitToGoogleSheets()">📤 Submit to Google Sheets</button>
       <div id="submit-result" class="status-msg" style="margin-top:12px;"></div>
@@ -824,152 +824,11 @@ pre{background:#0F172A;color:#E2E8F0;padding:14px;border-radius:8px;font-size:12
 
   <div class="nav-btns">
     <button class="nav-btn" onclick="goTo(6)">← Cases 6–10</button>
-    <button class="nav-btn" onclick="goTo(8)">⚙ Setup Guide →</button>
-  </div>
-</div>
-
-<!-- ══ SEC 8: SETUP GUIDE ══ -->
-<div class="sec" id="sec-8">
-  <div class="sec-tag">Instructor Setup Guide</div>
-  <div class="sec-hdr"><h2>Google Sheets Submission Setup</h2><p>One-time setup. Estimated time: <strong>10–15 minutes</strong>. Free, no backend server required.</p></div>
-
-  <div class="card" style="border:2px solid var(--amber);">
-    <h3>🏗 Architecture Overview</h3>
-    <p><strong>How it works:</strong> The HTML module runs entirely in the student's browser → when a student clicks "Submit", it sends their data as a POST request to a <strong>Google Apps Script Web App URL</strong> you create → the script writes directly into your Google Sheet → you see all student submissions in real-time with automatic marks calculated.</p>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px;text-align:center;">
-      <div style="background:#EEF3FF;border-radius:8px;padding:14px;"><div style="font-size:22px;">🌐</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Student Browser</div><div style="font-size:11px;color:var(--muted);">Completes module, submits answers</div></div>
-      <div style="background:#F0FDFA;border-radius:8px;padding:14px;"><div style="font-size:22px;">⚙️</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Apps Script Web App</div><div style="font-size:11px;color:var(--muted);">Your free Google automation script</div></div>
-      <div style="background:#F0FDF4;border-radius:8px;padding:14px;"><div style="font-size:22px;">📊</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-top:4px;">Google Sheet</div><div style="font-size:11px;color:var(--muted);">Auto-recorded results + marks</div></div>
-    </div>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">1</span>Create a Google Sheet</div>
-    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
-      <li>Go to <strong>sheets.google.com</strong> and create a new spreadsheet</li>
-      <li>Name it: <code>NHS Self-Care Module Submissions</code></li>
-      <li>In Row 1, create these column headers (exactly):<br>
-        <code>Timestamp | StudentID | StudentName | Section | Email | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 | CorrectCount | TotalMarks | Percentage | Q1_Correct | Q2_Correct | Q3_Correct | Q4_Correct | Q5_Correct | Q6_Correct | Q7_Correct | Q8_Correct | Q9_Correct | Q10_Correct</code></li>
-    </ol>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">2</span>Create the Apps Script</div>
-    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
-      <li>In your Google Sheet, click <strong>Extensions → Apps Script</strong></li>
-      <li>Delete any existing code and paste the following:</li>
-    </ol>
-    <pre>function doPost(e) {
-  try {
-    var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-    var data = JSON.parse(e.postData.contents);
-    var answers = data.answers; // {Q1:"A", Q2:"C", ...}
-    var correct = {Q1:"A",Q2:"C",Q3:"B",Q4:"C",Q5:"B",
-                   Q6:"B",Q7:"C",Q8:"C",Q9:"A",Q10:"C"};
-    
-    var correctCount = 0;
-    var qCorrectArr = [];
-    for (var i = 1; i <= 10; i++) {
-      var key = "Q" + i;
-      var isRight = (answers[key] === correct[key]) ? 1 : 0;
-      correctCount += isRight;
-      qCorrectArr.push(isRight ? "✓" : "✗ (" + correct[key] + ")");
-    }
-    var marks = correctCount * 1;
-    var pct = Math.round((marks / 10) * 100);
-    
-    var row = [
-      new Date(),
-      data.studentId,
-      data.studentName,
-      data.section || "",
-      data.email || "",
-      answers.Q1||"", answers.Q2||"", answers.Q3||"",
-      answers.Q4||"", answers.Q5||"", answers.Q6||"",
-      answers.Q7||"", answers.Q8||"", answers.Q9||"",
-      answers.Q10||"",
-      correctCount,
-      marks,
-      pct + "%"
-    ].concat(qCorrectArr);
-    
-    sheet.appendRow(row);
-    
-    return ContentService
-      .createTextOutput(JSON.stringify({
-        success: true,
-        marks: marks,
-        correct: correctCount,
-        percentage: pct
-      }))
-      .setMimeType(ContentService.MimeType.JSON);
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({success:false, error:err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function doGet(e) {
-  return ContentService
-    .createTextOutput("NHS Self-Care Module - Submission endpoint active")
-    .setMimeType(ContentService.MimeType.TEXT);
-}</pre>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">3</span>Deploy as Web App</div>
-    <ol style="padding-left:20px;font-size:14px;line-height:1.8;">
-      <li>Click <strong>Deploy → New deployment</strong></li>
-      <li>Select type: <strong>Web app</strong></li>
-      <li>Description: <code>NHS Module Submission</code></li>
-      <li>Execute as: <strong>Me (your Google account)</strong></li>
-      <li>Who has access: <strong>Anyone</strong> ← Important!</li>
-      <li>Click <strong>Deploy</strong> → Authorise when prompted</li>
-      <li><strong>Copy the Web App URL</strong> (looks like: <code>https://script.google.com/macros/s/AKfy.../exec</code>)</li>
-    </ol>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">4</span>Enter the URL Below</div>
-    <p style="font-size:14px;margin-bottom:10px;">Paste your Apps Script Web App URL here. This is saved in the module for all student submissions.</p>
-    <div class="url-input-grp">
-      <input type="text" class="url-input" id="apps-script-url" placeholder="https://script.google.com/macros/s/YOUR_ID/exec" />
-      <button class="save-url-btn" onclick="saveScriptUrl()">Save URL</button>
-    </div>
-    <div class="status-msg" id="url-save-status"></div>
-    <div class="pearl" style="margin-top:14px;">
-      <div class="p-lbl">💡 Testing</div>
-      <p>After saving the URL, go back to the <strong>Submit &amp; Results</strong> section and test with a student submission. Check your Google Sheet to confirm data appears. Each row = one student submission with automatic marks calculation.</p>
-    </div>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">5</span>Share with Students</div>
-    <p style="font-size:14px;line-height:1.7;">Share the HTML file with students via:</p>
-    <ul style="padding-left:20px;font-size:14px;line-height:1.8;">
-      <li>Upload to <strong>Moodle / Blackboard</strong> as a course resource</li>
-      <li>Share via <strong>Microsoft Teams</strong> file share</li>
-      <li>Host on <strong>GitHub Pages</strong> (free) for a permanent URL</li>
-      <li>Share via <strong>Google Drive</strong> with download link</li>
-    </ul>
-    <div class="pearl warn"><div class="p-lbl" style="color:#B45309;">⚠️ Important Note on CORS</div>
-      <p>When students submit from a local file (file://), browsers may block the request. <strong>Recommended:</strong> Host the HTML on a server (even GitHub Pages free hosting) so submissions work reliably. Alternatively, Google Forms as a backup submission sheet can be linked.</p>
-    </div>
-  </div>
-
-  <div class="setup-step">
-    <div class="setup-step-hdr"><span class="step-num">6</span>Google Sheets Auto-Grading Formula (Optional)</div>
-    <p style="font-size:14px;margin-bottom:10px;">Add this formula in column R (or wherever you want a grade band) in your sheet:</p>
-    <pre>=IF(R2&gt;=90,"A+ (Distinction)",IF(R2&gt;=80,"A (Excellent)",IF(R2&gt;=70,"B (Good)",IF(R2&gt;=60,"C (Pass)","D (Needs Review)"))))</pre>
-    <p style="font-size:13px;color:var(--muted);margin-top:8px;">Where R2 contains the Percentage value. Replace column letters as needed.</p>
-  </div>
-
-  <div class="nav-btns">
-    <button class="nav-btn" onclick="goTo(7)">← Results</button>
     <button class="nav-btn" onclick="goTo(0)">🏠 Back to Start</button>
   </div>
 </div>
+
+
 
 </main>
 </div>
@@ -1085,7 +944,7 @@ function goTo(idx) {
 }
 
 function updateProgress(idx) {
-  document.getElementById('pbar').style.width = Math.round((idx/8)*100) + '%';
+  document.getElementById('pbar').style.width = Math.round((idx/7)*100) + '%';
 }
 
 // ── REGISTRATION ──
